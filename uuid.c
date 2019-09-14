@@ -44,7 +44,7 @@ const char * bytes_to_hex(const void * buffer, size_t n) {
 // https://tools.ietf.org/html/rfc4122#section-3
 const char * uuid_string(const uuid_t * uuid) {
     const char * hex = bytes_to_hex(uuid, sizeof(uuid_t));
-    if (hex == "") return ""; // malloc failed above
+    if (!strlen(hex)) return ""; // malloc failed above
 
     size_t sizes[5] = {8, 4, 4, 4, 12};
     size_t dstp = 0, srcp = 0;

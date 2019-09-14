@@ -1,0 +1,3 @@
+[submodule "vendor/pcg"]
+	path = vendor/pcg
+	url = https://github.com/mikmart/pcg-c-basic.git

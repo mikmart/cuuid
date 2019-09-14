@@ -3,6 +3,7 @@
 #include "cuuid.h"
 
 void random_bytes(void * buffer, size_t n) {
+    // TODO: Use a better source of randomness
     for (size_t i = 0; i < n; i++) {
         ((char *)buffer)[i] = rand();
     }

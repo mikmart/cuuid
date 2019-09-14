@@ -1,7 +1,28 @@
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <math.h>
 #include "cuuid.h"
-#include "cuuidrng.h"
+#include "pcg_basic.h"
+
+static int rng_initialized = 0;
+
+void rng_initialize() {
+    pcg32_srandom(time(NULL) ^ (intptr_t)&time, (intptr_t)&rng_initialized);
+    rng_initialized = 1;
+}
+
+void random_bytes(void * buffer, size_t n) {
+    if (!rng_initialized) rng_initialize();
+
+    size_t n_ints = ceil(n / sizeof(uint32_t));
+    uint32_t * bytes = malloc(sizeof(uint32_t) * n_ints);
+    for (size_t i = 0; i < n_ints; i++) {
+        bytes[i] = pcg32_random();
+    }
+
+    memcpy(buffer, bytes, n);
+}
 
 // https://tools.ietf.org/html/rfc4122#section-4.4
 uuid_t uuid4_generate() {

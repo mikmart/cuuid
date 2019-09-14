@@ -1,6 +1,6 @@
 #include <string.h> // memcpy
 #include <time.h>
-#include "vendor/pcg/pcg_basic.h"
+#include "pcg_basic.h"
 
 static int rng_initialized = 0;
 

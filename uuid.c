@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "uuid.h"
+#include "cuuid.h"
 
 void random_bytes(void * buffer, size_t n) {
     for (size_t i = 0; i < n; i++) {

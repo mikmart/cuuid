@@ -11,7 +11,6 @@ struct uuid_s {
 
 typedef char uuid_str_t[37];
 
-// uuid.c
 uuid_t uuid4_generate();
 void uuid_string(const uuid_t * uuid, uuid_str_t str);
 

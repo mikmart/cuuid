@@ -5,31 +5,22 @@
 #include "cuuid.h"
 #include "pcg_basic.h"
 
-static int rng_initialized = 0;
+static int rng_initialised = 0;
 
-void rng_initialize() {
-    pcg32_srandom(time(NULL) ^ (intptr_t)&time, (intptr_t)&rng_initialized);
-    rng_initialized = 1;
-}
-
-void random_bytes(void * buffer, size_t n) {
-    if (!rng_initialized) rng_initialize();
-
-    size_t n_ints = ceil(n / sizeof(uint32_t));
-    uint32_t * bytes = malloc(sizeof(uint32_t) * n_ints);
-    for (size_t i = 0; i < n_ints; i++) {
-        bytes[i] = pcg32_random();
-    }
-
-    memcpy(buffer, bytes, n);
+void rng_initialise() {
+    pcg32_srandom(time(NULL) ^ (intptr_t)&time, (intptr_t)&rng_initialised);
+    rng_initialised = 1;
 }
 
 // https://tools.ietf.org/html/rfc4122#section-4.4
 uuid_t uuid4_generate() {
+    if (!rng_initialised) rng_initialise();
+
     uuid_t uuid;
-
-    random_bytes(&uuid, sizeof(uuid_t));
-
+    for (size_t i = 0; i < 4; i++) {
+        ((uint32_t *)&uuid)[i] = pcg32_random();
+    }
+    
     // version bits: 0100 ----
     uuid.octet[6] &= 0x0f;
     uuid.octet[6] |= 0x01 << 6;
@@ -41,32 +32,22 @@ uuid_t uuid4_generate() {
     return uuid;
 }
 
-const char * bytes_to_hex(const void * buffer, size_t n) {
+void uuid_hex(const uuid_t * uuid, char str[33]) {
     static const char * hex = "0123456789abcdef";
-    char * buf = (char *)buffer;
-
-    char * str = malloc(n * 2 + 1);
-    if (!str) return "";
-
-    for (size_t i = 0; i < n; i++) {
-        str[i * 2 + 0] = hex[(buf[i] >> 4) & 0x0f];
-        str[i * 2 + 1] = hex[(buf[i] >> 0) & 0x0f];
+    for (size_t i = 0; i < 16; i++) {
+        str[i * 2 + 0] = hex[(uuid->octet[i] >> 4) & 0x0f];
+        str[i * 2 + 1] = hex[(uuid->octet[i] >> 0) & 0x0f];
     }
-
-    str[n * 2] = 0;
-    return str;
+    str[32] = 0;
 }
 
 // https://tools.ietf.org/html/rfc4122#section-3
-const char * uuid_string(const uuid_t * uuid) {
-    const char * hex = bytes_to_hex(uuid, sizeof(uuid_t));
-    if (!strlen(hex)) return ""; // malloc failed above
+void uuid_string(const uuid_t * uuid, char str[UUID_STRLEN]) {
+    char hex[33];
+    uuid_hex(uuid, hex);
 
     size_t sizes[5] = {8, 4, 4, 4, 12};
     size_t dstp = 0, srcp = 0;
-
-    char * str = malloc(sizeof(uuid_t) * 2 + 5);
-    if (!str) return "";
 
     for (size_t i = 0; i < 5; i++) {
         memcpy(str + dstp, hex + srcp, sizes[i]);
@@ -74,7 +55,6 @@ const char * uuid_string(const uuid_t * uuid) {
         srcp += sizes[i];
         str[dstp++] = '-';
     }
-
-    str[sizeof(uuid_t) * 2 + 4] = 0;
-    return str;
+    
+    str[36] = 0;
 }

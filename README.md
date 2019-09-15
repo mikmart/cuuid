@@ -4,7 +4,7 @@ A minimal C library for generating version 4 universally unique identifiers (UUI
 
 ## Usage
 
-Generate a UUID byte array with `uuid4_generate()`. To get a string, pass its pointer to `uuid_string()`:
+Generate a UUID byte array with `uuid4_generate()`. To get a string, pass its pointer to `uuid_string()`, along with a buffer of length `UUID_STRLEN` to fill:
 
 ``` c
 #include <stdio.h>
@@ -12,6 +12,8 @@ Generate a UUID byte array with `uuid4_generate()`. To get a string, pass its po
 
 int main() {
     uuid_t uuid = uuid4_generate();
-    printf("%s\n", uuid_string(&uuid));
+    char str[UUID_STRLEN];
+    uuid_string(&uuid, str);    
+    printf("%s\n", str);
 }
 ```

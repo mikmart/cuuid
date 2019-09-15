@@ -41,7 +41,7 @@ void uuid_hex(const uuid_t * uuid, char str[33]) {
 }
 
 // https://tools.ietf.org/html/rfc4122#section-3
-void uuid_string(const uuid_t * uuid, char str[UUID_STRLEN]) {
+void uuid_string(const uuid_t * uuid, uuid_str_t str) {
     char hex[33];
     uuid_hex(uuid, hex);
 

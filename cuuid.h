@@ -9,11 +9,11 @@ struct uuid_s {
     unsigned char octet[16];
 } typedef uuid_t;
 
-#define UUID_STRLEN 37
+typedef char uuid_str_t[37];
 
 // uuid.c
 uuid_t uuid4_generate();
-void uuid_string(const uuid_t * uuid, char str[UUID_STRLEN]);
+void uuid_string(const uuid_t * uuid, uuid_str_t str);
 
 #ifdef __cplusplus
 } // extern C

@@ -7,7 +7,9 @@
 static int rng_initialised = 0;
 
 void rng_initialise() {
-    pcg32_srandom(time(NULL) ^ (intptr_t)&time, (intptr_t)&rng_initialised);
+    uint64_t state  = time(NULL) ^ (intptr_t)&time;
+    uint64_t stream = (intptr_t)&rng_initialised;
+    pcg32_srandom(state, stream);
     rng_initialised = 1;
 }
 
@@ -34,8 +36,8 @@ uuid_t uuid4_generate() {
 void uuid_hex(const uuid_t * uuid, char str[33]) {
     static const char * hex = "0123456789abcdef";
     for (size_t i = 0; i < 16; i++) {
-        str[i * 2 + 0] = hex[(uuid->octet[i] >> 4) & 0x0f];
-        str[i * 2 + 1] = hex[(uuid->octet[i] >> 0) & 0x0f];
+        str[i * 2 + 0] = hex[uuid->octet[i] >> 4];
+        str[i * 2 + 1] = hex[uuid->octet[i] & 0x0f];
     }
     str[32] = 0;
 }

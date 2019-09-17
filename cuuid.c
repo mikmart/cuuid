@@ -33,7 +33,7 @@ uuid_t uuid4_generate() {
     return uuid;
 }
 
-void uuid_hex(const uuid_t * uuid, char str[33]) {
+void uuid_hex(const uuid_t * uuid, uuid_hex_t str) {
     static const char * hex = "0123456789abcdef";
     for (size_t i = 0; i < 16; i++) {
         str[i * 2 + 0] = hex[uuid->octet[i] >> 4];
@@ -44,7 +44,7 @@ void uuid_hex(const uuid_t * uuid, char str[33]) {
 
 // https://tools.ietf.org/html/rfc4122#section-3
 void uuid_string(const uuid_t * uuid, uuid_str_t str) {
-    char hex[33];
+    uuid_hex_t hex;
     uuid_hex(uuid, hex);
 
     size_t sizes[5] = {8, 4, 4, 4, 12};

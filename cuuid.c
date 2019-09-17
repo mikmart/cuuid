@@ -7,7 +7,7 @@
 static int rng_initialised = 0;
 
 void rng_initialise() {
-    uint64_t state  = time(NULL) ^ (intptr_t)&time;
+    uint64_t state = time(NULL) ^ (intptr_t)&time;
     uint64_t stream = (intptr_t)&rng_initialised;
     pcg32_srandom(state, stream);
     rng_initialised = 1;
@@ -35,11 +35,11 @@ uuid_t uuid4_generate() {
 
 void uuid_hex(const uuid_t * uuid, uuid_hex_t str) {
     static const char * hex = "0123456789abcdef";
-    for (size_t i = 0; i < 16; i++) {
+    for (size_t i = 0; i < sizeof(uuid_t); i++) {
         str[i * 2 + 0] = hex[uuid->octet[i] >> 4];
         str[i * 2 + 1] = hex[uuid->octet[i] & 0x0f];
     }
-    str[32] = 0;
+    str[sizeof(uuid_t) * 2] = 0;
 }
 
 // https://tools.ietf.org/html/rfc4122#section-3
@@ -57,5 +57,5 @@ void uuid_string(const uuid_t * uuid, uuid_str_t str) {
         str[dstp++] = '-';
     }
     
-    str[36] = 0;
+    str[strlen(hex) + 4] = 0;
 }

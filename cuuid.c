@@ -33,29 +33,21 @@ uuid_t uuid4_generate() {
     return uuid;
 }
 
-void uuid_hex(const uuid_t * uuid, uuid_hex_t str) {
-    static const char * hex = "0123456789abcdef";
-    for (size_t i = 0; i < sizeof(uuid_t); i++) {
-        str[i * 2 + 0] = hex[uuid->octet[i] >> 4];
-        str[i * 2 + 1] = hex[uuid->octet[i] & 0x0f];
-    }
-    str[sizeof(uuid_t) * 2] = 0;
-}
-
 // https://tools.ietf.org/html/rfc4122#section-3
 void uuid_string(const uuid_t * uuid, uuid_str_t str) {
-    uuid_hex_t hex;
-    uuid_hex(uuid, hex);
+    static const char * s_hex = "0123456789abcdef";
 
-    size_t sizes[5] = {8, 4, 4, 4, 12};
-    size_t dstp = 0, srcp = 0;
+    size_t chunk_bytes[5] = {4, 2, 2, 2, 6};
+    size_t srcp = 0, dstp = 0;
 
     for (size_t i = 0; i < 5; i++) {
-        memcpy(str + dstp, hex + srcp, sizes[i]);
-        dstp += sizes[i];
-        srcp += sizes[i];
+        for (size_t j = 0; j < chunk_bytes[i]; j++) {
+            unsigned char byte = uuid->octet[srcp++];
+            str[dstp++] = s_hex[byte >> 4];
+            str[dstp++] = s_hex[byte & 0x0f];
+        }
         str[dstp++] = '-';
     }
     
-    str[strlen(hex) + 4] = 0;
+    str[dstp - 1] = '\0';
 }
